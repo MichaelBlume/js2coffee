@@ -47,7 +47,7 @@ class Builder
   constructor: ->
     @transformer = new Transformer
 
-  # `build()`  
+  # `build()`
   # The main entry point.
 
   # This finds the appropriate @builder function for `node` based on it's type,
@@ -68,7 +68,7 @@ class Builder
 
     if node.parenthesized then paren(out) else out
 
-  # `transform()`  
+  # `transform()`
   # Perform a transformation on the node, if a transformation function is
   # available.
 
@@ -78,12 +78,12 @@ class Builder
   # `body()`
   # Works like `@build()`, and is used for code blocks. It cleans up the returned
   # code block by removing any extraneous spaces and such.
-  
+
   body: (node, opts={}) ->
     str = @build(node, opts)
     str = blockTrim(str)
     str = unshift(str)
-  
+
     if str.length > 0 then str else ""
 
   # ## The builders
@@ -93,7 +93,7 @@ class Builder
   #
   # These are invoked using the main entry point, `Builder#build()`.
 
-  # `script`  
+  # `script`
   # This is the main entry point.
 
   'script': (n, opts={}) ->
@@ -105,7 +105,7 @@ class Builder
 
     c.toString()
 
-  # `property_identifier`  
+  # `property_identifier`
   # A key in an object literal.
 
   'property_identifier': (n) ->
@@ -120,7 +120,7 @@ class Builder
     else
       strEscape str
 
-  # `identifier`  
+  # `identifier`
   # Any object identifier like a variable name.
 
   'identifier': (n) ->
@@ -138,7 +138,7 @@ class Builder
     else
       unreserve n
 
-  # `id_param`  
+  # `id_param`
   # Function parameters. Belongs to `list`.
 
   'id_param': (n) ->
@@ -147,7 +147,7 @@ class Builder
     else
       @id n
 
-  # `return`  
+  # `return`
   # A return statement. Has `n.value` of type `id`.
 
   'return': (n) ->
@@ -157,7 +157,7 @@ class Builder
     else
       "return #{@build(n.value)}\n"
 
-  # `;` (aka, statement)  
+  # `;` (aka, statement)
   # A single statement.
 
   ';': (n) ->
@@ -178,7 +178,7 @@ class Builder
     else
       @build(n.expression) + "\n"
 
-  # `new` + `new_with_args`  
+  # `new` + `new_with_args`
   # For `new X` and `new X(y)` respctively.
 
   'new': (n) -> "new #{@build n.left()}"
@@ -268,7 +268,7 @@ class Builder
     else
       "#{sign}#{@build n.left()}"
 
-  # `=` (aka, assignment)  
+  # `=` (aka, assignment)
   # For `a = b` (but not `var a = b`: that's `var`).
 
   '=': (n) ->
@@ -279,14 +279,14 @@ class Builder
 
     "#{@build n.left()} #{sign} #{@build n.right()}"
 
-  # `,` (aka, comma)  
+  # `,` (aka, comma)
   # For `a = 1, b = 2'
 
   ',': (n) ->
     list = _.map n.children, (item) => @build(item) + "\n"
     list.join('')
 
-  # `regexp`  
+  # `regexp`
   # Regular expressions.
 
   'regexp': (n) ->
@@ -311,7 +311,7 @@ class Builder
   'string': (n) ->
     strEscape n.value
 
-  # `call`  
+  # `call`
   # A Function call.
   # `n.left` is an `id`, and `n.right` is a `list`.
 
@@ -321,7 +321,7 @@ class Builder
     else
       "#{@build n.left()}(#{@build n.right()})"
 
-  # `call_statement`  
+  # `call_statement`
   # A `call` that's on it's own line.
 
   'call_statement': (n) ->
@@ -339,7 +339,7 @@ class Builder
     else
       "#{left} #{@build n.right()}"
 
-  # `list`  
+  # `list`
   # A parameter list.
 
   'list': (n) ->
@@ -352,7 +352,7 @@ class Builder
     ids = ids.join(', ')
     "delete #{ids}\n"
 
-  # `.` (scope resolution?)  
+  # `.` (scope resolution?)
   # For instances such as `object.value`.
 
   '.': (n) ->
@@ -406,7 +406,7 @@ class Builder
     c.scope @body(n.block)
     c
 
-  # `?` (ternary operator)  
+  # `?` (ternary operator)
   # For `a ? b : c`. Note that these will always be parenthesized, as (I
   # believe) the order of operations in JS is different in CS.
 
@@ -500,7 +500,7 @@ class Builder
     else
       "[ #{@list n} ]"
 
-  # `property_init`  
+  # `property_init`
   # Belongs to `object_init`;
   # left is a `identifier`, right can be anything.
 
@@ -510,7 +510,7 @@ class Builder
     right.is_property_value = true
     "#{@property_identifier left}: #{@build right}"
 
-  # `object_init`  
+  # `object_init`
   # An object initializer.
   # Has many `property_init`.
 
@@ -529,7 +529,7 @@ class Builder
       c = "{#{c}}"  if options.brackets?
       c
 
-  # `function`  
+  # `function`
   # A function. Can be an anonymous function (`function () { .. }`), or a named
   # function (`function name() { .. }`).
 
@@ -581,7 +581,7 @@ class Builder
   'block': (args...) ->
     @script.apply @, args
 
-  # `unsupported()`  
+  # `unsupported()`
   # Throws an unsupported error.
   'unsupported': (node, message) ->
     throw new UnsupportedError("Unsupported: #{message}", node)
